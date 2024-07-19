@@ -1,0 +1,39 @@
+node_modules
+/biyi-dist
+.history
+package-lock.json
+biyi-dist.zip
+
+######################
+# Eclipse
+######################
+*.pydevproject
+.project
+.metadata
+tmp/
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+.classpath
+.settings/
+.loadpath
+.factorypath
+
+######################
+# Intellij
+######################
+.idea/
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+classes/
+
+######################
+# Maven
+######################
+/log/
+/target/
