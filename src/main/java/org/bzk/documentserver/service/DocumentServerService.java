@@ -1,5 +1,6 @@
 package org.bzk.documentserver.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bzk.documentserver.bean.Document;
 import org.bzk.documentserver.bean.EditorConfig;
 import org.bzk.documentserver.exception.DocumentServerException;
@@ -21,7 +22,6 @@ public interface DocumentServerService {
      * @return
      */
     EditorConfig buildEditorConfig(String id, String user,String viewMode,String value,Integer zoom);
-
 
     void callBack(HttpServletRequest request, HttpServletResponse response) throws IOException, DocumentServerException;
 

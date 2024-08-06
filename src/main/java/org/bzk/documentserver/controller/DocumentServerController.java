@@ -1,7 +1,6 @@
 package org.bzk.documentserver.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bzk.documentserver.UpdateCtl;
 import org.bzk.documentserver.bean.Document;
@@ -62,7 +61,6 @@ public class DocumentServerController {
     private MinioUploadUtil minioUploadUtil;
 
 
-
     @PostMapping("/updateAttachName") //修改显示文件名
     @ResponseBody
     public Map updateAttachName(@RequestBody UpdateCtl updateCtl) {//SearchTemplateFlag "0" 不查模板 “1”查模板 2或为空 查所有
@@ -78,15 +76,15 @@ public class DocumentServerController {
     @ResponseBody
     public Map pagination(String keyWord,String tenantId,String userId,String user,String SearchTemplateFlag,String fileName,String pageIndex ,String pageSize,String options) throws UnsupportedEncodingException {//SearchTemplateFlag "0" 不查模板 “1”查模板 2或为空 查所有
 
-       if(StringUtils.isNotEmpty(keyWord)){
-           if(keyWord.indexOf(".")!=-1){
-               keyWord = keyWord.substring(1);
-           }
-       }
+        if(StringUtils.isNotEmpty(keyWord)){
+            if(keyWord.indexOf(".")!=-1){
+                keyWord = keyWord.substring(1);
+            }
+        }
         JSONObject orderBy = new JSONObject();
         if(StringUtils.isNotEmpty(options)){
 
-           // String encodedString = "Hello%20World%21";
+            // String encodedString = "Hello%20World%21";
             options = URLDecoder.decode(options, "UTF-8");
 //            System.out.println(decodedString); // 输出：Hello World!
 //            options = decodeURIComponent(options);
@@ -115,7 +113,7 @@ public class DocumentServerController {
     @PostMapping(value = "upload")
     public Map upload(@RequestParam("file") MultipartFile file, String templateCode, String documentCode,String tenantId,String userId,
                       String user,String defaultConfigIn,String defaultConfigOut,String category, String templateFlag ) {
-       
+
         System.out.println("2. 上传文档列表信息");
         Log.info("2. 上传文档列表信息");
         String id="";
@@ -130,12 +128,12 @@ public class DocumentServerController {
             if("null".equals( templateCode)) templateCode="";
             if("null".equals(documentCode)) documentCode="";
             id = fileService.upload(file,templateCode,documentCode,"",templateFlag,"",tenantId,userId,user, defaultConfigIn, defaultConfigOut,category); //templateCode 如果为空，表示不是模板
-           if("2".equals(templateFlag))
-           {  documentService.downloadDocxf(id,tenantId,userId,user,templateCode);
-               commandApiService.drop(id, user);
-               fileService.update(id,"1","","","","",tenantId,userId);
+            if("2".equals(templateFlag))
+            {  documentService.downloadDocxf(id,tenantId,userId,user,templateCode);
+                commandApiService.drop(id, user);
+                fileService.update(id,"1","","","","",tenantId,userId);
 
-           }
+            }
         } catch (DocumentServerException e) {
             e.printStackTrace();
             return CustomMap.build(2)
@@ -179,7 +177,7 @@ public class DocumentServerController {
     //查表单模板，并且下载模板 成一个新文件，类似
     //id 有值 则documentCode 、tempalteCode 为空，否则 documentCode 、tempalteCode必须有值
 
-   @PostMapping("/edit")
+    @PostMapping("/edit")
     public String editDocFile( String id,String documentCode,String templateCode, String user,String tenantId,String userId,String viewMode, Model model,String defaultValue,String zoom,String fileNameSuffix) {
         System.out.println("31. 查询并编辑文档");
         Log.info("31. 查询并编辑文档");
@@ -226,7 +224,7 @@ public class DocumentServerController {
             if(fileCount==0){
 
 
-               int objCount = fileService.getCountFileTempalte(templateCode,"1");
+                int objCount = fileService.getCountFileTempalte(templateCode,"1");
 
                 if(objCount==0){
 
@@ -240,7 +238,7 @@ public class DocumentServerController {
                 String s1 =  new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now);
                 String sourcePath = (String) obj.get("path");
 
-               // /home/ubuntu/data/docementServer/data/20230513181236046.xlsx
+                // /home/ubuntu/data/docementServer/data/20230513181236046.xlsx
 
 
                 String regex = "(?<=/)[0-9]+(?=\\.)";
@@ -255,12 +253,12 @@ public class DocumentServerController {
                 System.out.println("attach_show_file..."+attach_show_file);
                 System.out.println("attach_show_file..2."+temp);
 
-              // String deltemp=  temp[0].replace("模板","");
+                // String deltemp=  temp[0].replace("模板","");
                 String s2 =  new SimpleDateFormat("yyyyMMddHH").format(now);
                 String fname = temp+s2;
                 if(fname.contains("模板")||fname.contains("模版")){
-                   fname= fname.replaceAll("模板","");
-                   fname= fname.replaceAll("模版","");
+                    fname= fname.replaceAll("模板","");
+                    fname= fname.replaceAll("模版","");
                 }
 
                 //为熊猫汉达改文件名
@@ -288,7 +286,7 @@ public class DocumentServerController {
                     else{
                         Map<String, Object> obj2 = fileService.getFileId(templateId);
                         String fileName = (String) obj2.get("attach_file_name") ;
-                       // String orgfileName =(String) obj2.get("attach_show_name") ;
+                        // String orgfileName =(String) obj2.get("attach_show_name") ;
 
                         String orgfileName =fname+ "."+extractExtension((String) obj2.get("attach_show_name")) ;
                         String bucketName = "onlinedocument";
@@ -300,7 +298,7 @@ public class DocumentServerController {
                     }
 
 
-                  //MultipartFile multipartFile =FileUtils.getMultipartFile(file);
+                    //MultipartFile multipartFile =FileUtils.getMultipartFile(file);
 
 
                     fileService.upload(FileUtils.getMultipartFile(file),templateCode,documentCode,s1,"0",templateId,tenantId,userId,user,"","",category);
@@ -359,10 +357,10 @@ public class DocumentServerController {
         model.addAttribute("error", "传递参数错误 ");
         return "/errorblank";
         //return "/error";
-       // return "/editor";
+        // return "/editor";
     }
 
-    public static String extractExtension(String filename) {
+    public  String extractExtension(String filename) {
         int dotIndex = filename.lastIndexOf('.');
         if (dotIndex > 0 && dotIndex < filename.length() - 1) {
             return filename.substring(dotIndex + 1);
@@ -460,129 +458,133 @@ public class DocumentServerController {
     }
 
 
-    @GetMapping("/templateCode/count")
-    @ResponseBody
-    public CustomMap getTemplateByCode(@RequestParam String code,String templateFlag) throws DocumentServerException {
+
+
+@GetMapping("/templateCode/count")
+@ResponseBody
+public CustomMap getTemplateByCode(@RequestParam String code,String templateFlag) throws DocumentServerException {
 //         if(StringUtils.isEmpty(code)){
 //             return  CustomMap.build(2)
 //                     .pu1("msg", Error.SUCCESS.getMsg())
 //                     .pu1("code", Error.SUCCESS.getCode())
 //                     ;
 //         }
-        int count = fileService.getCountFileTempalte(code,templateFlag );
-        if(count>0){
-            return CustomMap.build(2)
-                    .pu1("msg", Error.DOC_TEMPLATE_CODE_EXISTS.getMsg())
-                    .pu1("code", Error.DOC_TEMPLATE_CODE_EXISTS.getCode())
-                    ;
-          }
+    int count = fileService.getCountFileTempalte(code,templateFlag );
+    if(count>0){
+        return CustomMap.build(2)
+                .pu1("msg", Error.DOC_TEMPLATE_CODE_EXISTS.getMsg())
+                .pu1("code", Error.DOC_TEMPLATE_CODE_EXISTS.getCode())
+                ;
+    }
 
+    return  CustomMap.build(2)
+            .pu1("msg", Error.SUCCESS.getMsg())
+            .pu1("code", Error.SUCCESS.getCode())
+            ;
+
+}
+
+@GetMapping("/documentCode/count")
+@ResponseBody
+public CustomMap getDocumentByCode(@RequestParam String code) throws DocumentServerException {
+    if(StringUtils.isEmpty(code)||"null".equals(code)){
         return  CustomMap.build(2)
                 .pu1("msg", Error.SUCCESS.getMsg())
                 .pu1("code", Error.SUCCESS.getCode())
                 ;
-
     }
-
-    @GetMapping("/documentCode/count")
-    @ResponseBody
-    public CustomMap getDocumentByCode(@RequestParam String code) throws DocumentServerException {
-        if(StringUtils.isEmpty(code)||"null".equals(code)){
-            return  CustomMap.build(2)
-                    .pu1("msg", Error.SUCCESS.getMsg())
-                    .pu1("code", Error.SUCCESS.getCode())
-                    ;
-        }
-        int count = fileService.getCountFileByDocumentCode(code);
-        if(count>0){
-            return CustomMap.build(2)
-                    .pu1("msg", Error.DOC_FILE_CODE_EXISTS.getMsg())
-                    .pu1("code", Error.DOC_FILE_CODE_EXISTS.getCode())
-                    ;
-        }
-
-        return  CustomMap.build(2)
-                .pu1("msg", Error.SUCCESS.getMsg())
-                .pu1("code", Error.SUCCESS.getCode())
+    int count = fileService.getCountFileByDocumentCode(code);
+    if(count>0){
+        return CustomMap.build(2)
+                .pu1("msg", Error.DOC_FILE_CODE_EXISTS.getMsg())
+                .pu1("code", Error.DOC_FILE_CODE_EXISTS.getCode())
                 ;
-
     }
 
-    @GetMapping("/document/count")
-    @ResponseBody
-    public CustomMap getDocumentByTenantId(@RequestParam String tenantId) throws DocumentServerException {
+    return  CustomMap.build(2)
+            .pu1("msg", Error.SUCCESS.getMsg())
+            .pu1("code", Error.SUCCESS.getCode())
+            ;
+
+}
+
+@GetMapping("/document/count")
+@ResponseBody
+public CustomMap getDocumentByTenantId(@RequestParam String tenantId) throws DocumentServerException {
 //        if(StringUtils.isEmpty(code)||"null".equals(code)){
 //            return  CustomMap.build(2)
 //                    .pu1("msg", Error.SUCCESS.getMsg())
 //                    .pu1("code", Error.SUCCESS.getCode())
 //                    ;
 //        }
-        int count = fileService.getCountFileByDocumentCode(tenantId);
-        if(count>0){
-            return CustomMap.build(2)
-                    .pu1("msg", Error.DOC_FILE_CODE_EXISTS.getMsg())
-                    .pu1("code", Error.DOC_FILE_CODE_EXISTS.getCode())
-                    ;
-        }
-
-        return  CustomMap.build(2)
-                .pu1("msg", Error.SUCCESS.getMsg())
-                .pu1("code", Error.SUCCESS.getCode())
+    int count = fileService.getCountFileByDocumentCode(tenantId);
+    if(count>0){
+        return CustomMap.build(2)
+                .pu1("msg", Error.DOC_FILE_CODE_EXISTS.getMsg())
+                .pu1("code", Error.DOC_FILE_CODE_EXISTS.getCode())
                 ;
-
     }
 
-    @GetMapping("/force-save")
-    @ResponseBody
-    public Map<String, Object> forceSave(@RequestParam String id) throws DocumentServerException {
-        System.out.println("6. 强制保存文件");
-        Log.info("6. 强制保存文件");
+    return  CustomMap.build(2)
+            .pu1("msg", Error.SUCCESS.getMsg())
+            .pu1("code", Error.SUCCESS.getCode())
+            ;
 
-        return CustomMap.build(1).pu1("data", commandApiService.forceSave(id));
-    }
+}
 
-    @GetMapping("/drop")
-    @ResponseBody
-    public Map drop(@RequestParam String id, String user,String tenantId,String userId) throws DocumentServerException {
-        System.out.println("7. 删除文件"+id);
-        //把delete_flage 改为1
-        fileService.update(id,"1","","","","",tenantId,userId);
-        return CustomMap.build(1).pu1("data", commandApiService.drop(id, user));
-    }
+@GetMapping("/force-save")
+@ResponseBody
+public Map<String, Object> forceSave(@RequestParam String id) throws DocumentServerException {
+    System.out.println("6. 强制保存文件");
+    Log.info("6. 强制保存文件");
 
-    @GetMapping("/fileId")
-    @ResponseBody
-    public Map infoFile(@RequestParam String id) throws DocumentServerException {
-        System.out.println("8. 获取文件信息");
-        return CustomMap.build(1).pu1("data", fileService.getFileId(id));
-    }
+    return CustomMap.build(1).pu1("data", commandApiService.forceSave(id));
+}
 
-    @GetMapping("/info")
-    @ResponseBody
-    public Map info(@RequestParam String id) throws DocumentServerException {
-        System.out.println("8. 获取文件信息");
-        return CustomMap.build(1).pu1("data", commandApiService.info(id));
-    }
+@GetMapping("/drop")
+@ResponseBody
+public Map drop(@RequestParam String id, String user,String tenantId,String userId) throws DocumentServerException {
+    System.out.println("7. 删除文件"+id);
+    //把delete_flage 改为1
+    fileService.update(id,"1","","","","",tenantId,userId);
+    return CustomMap.build(1).pu1("data", commandApiService.drop(id, user));
+}
 
-    @GetMapping("/license")
-    @ResponseBody
-    public Map license() throws DocumentServerException {
-        System.out.println("9. 获取文件license信息");
-        return CustomMap.build(1).pu1("data", commandApiService.license());
-    }
+@GetMapping("/fileId")
+@ResponseBody
+public Map infoFile(@RequestParam String id) throws DocumentServerException {
+    System.out.println("8. 获取文件信息");
+    return CustomMap.build(1).pu1("data", fileService.getFileId(id));
+}
 
-    @GetMapping("/meta")
-    @ResponseBody
-    public Map meta(@RequestParam String id) throws DocumentServerException {
-        System.out.println("10. 获取文件原始信息");
-        return CustomMap.build(1).pu1("data", commandApiService.meta(id));
-    }
+@GetMapping("/info")
+@ResponseBody
+public Map info(@RequestParam String id) throws DocumentServerException {
+    System.out.println("8. 获取文件信息");
+    return CustomMap.build(1).pu1("data", commandApiService.info(id));
+}
 
-    @GetMapping("/version")
-    @ResponseBody
-    public Map version() throws DocumentServerException {
-        System.out.println("11. 获取文件版本信息");
-        return CustomMap.build(1).pu1("data", commandApiService.version());
-    }
+@GetMapping("/license")
+@ResponseBody
+public Map license() throws DocumentServerException {
+    System.out.println("9. 获取文件license信息");
+    return CustomMap.build(1).pu1("data", commandApiService.license());
+}
+
+@GetMapping("/meta")
+@ResponseBody
+public Map meta(@RequestParam String id) throws DocumentServerException {
+    System.out.println("10. 获取文件原始信息");
+    return CustomMap.build(1).pu1("data", commandApiService.meta(id));
+}
+
+@GetMapping("/version")
+@ResponseBody
+public Map version() throws DocumentServerException {
+    System.out.println("11. 获取文件版本信息");
+    return CustomMap.build(1).pu1("data", commandApiService.version());
+}
+
+
 
 }

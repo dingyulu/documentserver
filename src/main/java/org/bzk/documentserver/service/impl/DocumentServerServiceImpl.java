@@ -2,10 +2,12 @@ package org.bzk.documentserver.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bzk.documentserver.bean.Document;
 import org.bzk.documentserver.bean.EditorConfig;
+import org.bzk.documentserver.bean.History;
 import org.bzk.documentserver.constant.Error;
 import org.bzk.documentserver.exception.DocumentServerException;
 import org.bzk.documentserver.propertie.DocumentServerProperties;
@@ -24,10 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +58,6 @@ public class DocumentServerServiceImpl implements DocumentServerService {
 
     @Resource
     private CommandService commandApiService;
-
 
     @Override
     public Document buildDocument(String id) throws DocumentServerException {
@@ -161,6 +159,8 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                         .build())
                 .build();
     }
+
+
 
 //    @Override
 //    public void download(String id, HttpServletResponse response) throws IOException {
@@ -601,16 +601,29 @@ public class DocumentServerServiceImpl implements DocumentServerService {
         System.out.println("callback....."+id);
         String filePath = fileService.getFilePath(id);
 
-
         Scanner scanner = new Scanner(request.getInputStream()).useDelimiter("\\A");
         String body = scanner.hasNext() ? scanner.next() : "";
         JSONObject js = JSON.parseObject(body);
         System.out.println("前置保存。。。。js。"+js);
        // js。{"key":"QDD8rEAMxyuy3ABn3Ne9uPdzQgO6dMIkrr7OXWBwS4NPrwJJJzcd6OX","status":7,"users":["uid-undefined"],"lastsave":"2023-05-18T12:52:43.000Z","forcesavetype":0}
+        //获取回调通知对象js,获取所需要参数currentVersion，history[{created,key,user{id,name},version,serverVersion}],changesUrl,fileType,previous........
+
+        //带有文档更改数据的文件的url地址
+        String changesurl = js.get("changesurl").toString();
+        System.out.println("changesurl----------"+changesurl);
+        //获取历史对象
+        String historyStr = js.get("history").toString();
+        History history = JSON.parseObject(historyStr,History.class);
+        System.out.println("history-----------"+history);
+        //文档唯一标识
+        String key = (String) js.get("key");
+        System.out.println("key---------"+key);
+        //当前文档版本的 url 地址
+        String url = (String) js.get("url");
+        System.out.println("url---------"+url);
 
 
         PrintWriter writer = response.getWriter();
-
         String error = "0";
         switch (js.getInteger("status")) {
             // 1 - document is being edited

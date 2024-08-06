@@ -23,6 +23,7 @@ var Editor = function () {
             documentType: '',
             editorConfig: {
                 callbackUrl: editorConfig.callbackUrl,
+                canUseHistory: true,
                 user: editorConfig.user,
                 lang: 'zh-CN',
                 //mode: 'view',
