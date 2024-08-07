@@ -16,11 +16,13 @@ public class HistoryDoc {
     /**创建时间*/
     private String created;
     /**用户主键*/
-    private Long userId;
+    private String userId;
     /**文档key*/
     private String docKey;
     /**版本号*/
     private String version;
     /**文件下载地址*/
     private String url;
+    /**文件id*/
+    private String fileId;
 }

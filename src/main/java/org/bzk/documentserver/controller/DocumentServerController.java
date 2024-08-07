@@ -5,11 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.bzk.documentserver.UpdateCtl;
 import org.bzk.documentserver.bean.Document;
 import org.bzk.documentserver.bean.EditorConfig;
+import org.bzk.documentserver.bean.HistoryVo;
 import org.bzk.documentserver.constant.Error;
 import org.bzk.documentserver.exception.DocumentServerException;
 import org.bzk.documentserver.service.CommandService;
 import org.bzk.documentserver.service.DocumentServerService;
 import org.bzk.documentserver.service.FileService;
+import org.bzk.documentserver.service.HistoryService;
 import org.bzk.documentserver.utils.CustomMap;
 import org.bzk.documentserver.utils.FileUtils;
 import org.bzk.documentserver.utils.Log;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +63,8 @@ public class DocumentServerController {
     @Autowired
     private MinioUploadUtil minioUploadUtil;
 
+    @Resource
+    private HistoryService historyService;
 
     @PostMapping("/updateAttachName") //修改显示文件名
     @ResponseBody
@@ -585,6 +590,10 @@ public Map version() throws DocumentServerException {
     return CustomMap.build(1).pu1("data", commandApiService.version());
 }
 
+@GetMapping("/history")
+public List<HistoryVo> history(){
+    return historyService.history();
+}
 
 
 }

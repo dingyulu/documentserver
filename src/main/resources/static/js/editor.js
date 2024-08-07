@@ -192,6 +192,20 @@ var Editor = function () {
                  * @param event
                  */
                 onRequestHistory : function () {
+                    // $.ajax({
+                    //     url: "http://192.168.198.128:8099/history",
+                    //     success: function (result) {
+                    //         console.log("成功:" + JSON.stringify(result));
+                    //         console.log(result.length);
+                    //         docEditor.refreshHistory({
+                    //                 currentVersion: result.length,
+                    //                 history: result,
+                    // });
+                    // },
+                    //     error: function (result) {
+                    //         console.log("错误:" + JSON.stringify(result));
+                    //     },
+                    // });
                     // docEditor.refreshHistory({
                     //     "currentVersion": 2,
                     //     "history": [

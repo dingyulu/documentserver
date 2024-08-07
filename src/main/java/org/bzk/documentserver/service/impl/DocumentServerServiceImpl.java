@@ -2,18 +2,18 @@ package org.bzk.documentserver.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bzk.documentserver.bean.Document;
-import org.bzk.documentserver.bean.EditorConfig;
-import org.bzk.documentserver.bean.History;
+import org.bzk.documentserver.bean.*;
 import org.bzk.documentserver.constant.Error;
 import org.bzk.documentserver.exception.DocumentServerException;
 import org.bzk.documentserver.propertie.DocumentServerProperties;
 import org.bzk.documentserver.service.CommandService;
 import org.bzk.documentserver.service.DocumentServerService;
 import org.bzk.documentserver.service.FileService;
+import org.bzk.documentserver.service.HistoryService;
 import org.bzk.documentserver.utils.*;
 import org.bzk.documentserver.utils.minio.MinioUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,10 @@ public class DocumentServerServiceImpl implements DocumentServerService {
 
     @Resource
     private CommandService commandApiService;
+
+    //历史记录注入
+    @Resource
+    private HistoryService historyService;
 
     @Override
     public Document buildDocument(String id) throws DocumentServerException {
@@ -607,22 +611,6 @@ public class DocumentServerServiceImpl implements DocumentServerService {
         System.out.println("前置保存。。。。js。"+js);
        // js。{"key":"QDD8rEAMxyuy3ABn3Ne9uPdzQgO6dMIkrr7OXWBwS4NPrwJJJzcd6OX","status":7,"users":["uid-undefined"],"lastsave":"2023-05-18T12:52:43.000Z","forcesavetype":0}
         //获取回调通知对象js,获取所需要参数currentVersion，history[{created,key,user{id,name},version,serverVersion}],changesUrl,fileType,previous........
-
-        //带有文档更改数据的文件的url地址
-        String changesurl = js.get("changesurl").toString();
-        System.out.println("changesurl----------"+changesurl);
-        //获取历史对象
-        String historyStr = js.get("history").toString();
-        History history = JSON.parseObject(historyStr,History.class);
-        System.out.println("history-----------"+history);
-        //文档唯一标识
-        String key = (String) js.get("key");
-        System.out.println("key---------"+key);
-        //当前文档版本的 url 地址
-        String url = (String) js.get("url");
-        System.out.println("url---------"+url);
-
-
         PrintWriter writer = response.getWriter();
         String error = "0";
         switch (js.getInteger("status")) {
@@ -636,6 +624,42 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                 Log.info("action: SAVE");
                 System.out.println("action: SAVE"+js);
                 resourceAcquisitionAndSave(js.getString("url"), filePath,js.getString("key"),id);
+//                System.out.println("---------------------------------------------------------------------------------------------"+ js);
+//                //带有文档更改数据的文件的url地址（保存文件的修改记录）
+//                String changesurl = js.containsKey("changesurl")?js.get("changesurl").toString():"";
+////              String changesurl = js.get("changesurl").toString();
+//                System.out.println("changesurl----------"+changesurl);
+//                //获取历史对象
+//                String historyStr = js.get("history").toString();
+//                History history = JSON.parseObject(historyStr,History.class);
+//                System.out.println("history-----------"+history);
+//                //文档唯一标识
+//                String key = (String) js.get("key");
+//                System.out.println("key---------"+key);
+//                //当前文档版本的 url 地址(保存变更后的文件)
+//                String url = (String) js.get("url");
+//                System.out.println("url---------"+url);
+//                // 根据文件id获取数据库中存在的记录
+//                long count = historyService.count(new LambdaQueryWrapper<HistoryDoc>().eq(HistoryDoc::getFileId, id));
+//                for (int i = 0; i < history.getChanges().size(); i++) {
+//                    count++;
+//                    Changes change = history.getChanges().get(i);
+//                    User user = change.getUser();
+//                    // 添加历史记录
+//                    HistoryDoc historyDoc = new HistoryDoc();
+//                    historyDoc.setVersion(Long.toString(count));
+//                    historyDoc.setCreated(change.getCreated());
+//                    historyDoc.setServerVersion(history.getServerVersion());
+//                    historyDoc.setDocKey(key);
+//                    historyDoc.setFileId(id);
+//                    historyDoc.setUrl(url);
+//                    historyDoc.setUserId(user.getId());
+//                    if (!historyService.saveOrUpdate(historyDoc)) {
+//                        Log.error("保存{}失败",historyDoc);
+//                    }else{
+//                        Log.info("保存{}成功",historyDoc);
+//                    }
+//                }
                 break;
             // 3 - document saving error has occurred
             case 3:
