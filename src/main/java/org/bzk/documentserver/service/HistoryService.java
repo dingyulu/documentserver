@@ -8,5 +8,8 @@ import java.util.List;
 
 
 public interface HistoryService extends IService<HistoryDoc> {
-    List<HistoryVo> history();
+    List<HistoryVo> history( String fileId);
+
+    //根据文件idc查询历史记录
+    List<HistoryDoc>  listByFileId(String fileId);
 }

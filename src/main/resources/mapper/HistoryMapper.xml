@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.bzk.documentserver.mapper.HistoryMapper">
-<!--    &lt;!&ndash; 通用查询映射结果 &ndash;&gt;-->
-<!--    <resultMap id="BaseResultMap" type="org.bzk.documentserver.bean.HistoryDoc">-->
-<!--        <id column="id" property="id" />-->
-<!--        <result column="create_time" property="createTime" />-->
-<!--    </resultMap>-->
-
-<!--    &lt;!&ndash; 通用查询结果列 &ndash;&gt;-->
-<!--    <sql id="Base_Column_List">-->
-<!--        id-->
-<!--    </sql>-->
+    <select id="selectByFileId" resultType="org.bzk.documentserver.bean.HistoryDoc">
+        SELECT * FROM history WHERE file_id = #{fileId}
+    </select>
 </mapper>

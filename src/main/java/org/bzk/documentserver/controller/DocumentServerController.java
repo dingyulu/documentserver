@@ -591,8 +591,9 @@ public Map version() throws DocumentServerException {
 }
 
 @GetMapping("/history")
-public List<HistoryVo> history(){
-    return historyService.history();
+@ResponseBody
+public List<HistoryVo> history(String fileId){
+    return historyService.history(fileId);
 }
 
 

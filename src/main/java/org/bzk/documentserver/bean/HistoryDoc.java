@@ -25,4 +25,6 @@ public class HistoryDoc {
     private String url;
     /**文件id*/
     private String fileId;
+    /**用户名*/
+    private String userName;
 }

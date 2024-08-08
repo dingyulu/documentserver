@@ -189,23 +189,24 @@ var Editor = function () {
                  * 如果未声明该方法和 onRequestHistoryData 方法，则不会显示 版本历史 按钮。
                  * 其中 changes 是保存文档后返回的 历史对象 的 更改。
                  * 其中 serverVersion 是保存文档后返回的 历史对象 中的 serverVersion 。
-                 * @param event
                  */
                 onRequestHistory : function () {
-                    // $.ajax({
-                    //     url: "http://192.168.198.128:8099/history",
-                    //     success: function (result) {
-                    //         console.log("成功:" + JSON.stringify(result));
-                    //         console.log(result.length);
-                    //         docEditor.refreshHistory({
-                    //                 currentVersion: result.length,
-                    //                 history: result,
-                    // });
-                    // },
-                    //     error: function (result) {
-                    //         console.log("错误:" + JSON.stringify(result));
-                    //     },
-                    // });
+                    let fileId = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
+                    console.log(fileId,"1111111111111111111111111111")
+                    $.ajax({
+                        url: "http://192.168.198.128:8099/api/history?fileId="+fileId,
+                        success: function (result) {
+                            console.log("成功:" + JSON.stringify(result));
+                            console.log(result.length);
+                            docEditor.refreshHistory({
+                                    "currentVersion": result.length,
+                                    "history": result,
+                            });
+                        },
+                        error: function (result) {
+                            console.log("错误:" + JSON.stringify(result));
+                        },
+                    });
                     // docEditor.refreshHistory({
                     //     "currentVersion": 2,
                     //     "history": [
@@ -334,6 +335,10 @@ var Editor = function () {
         };
 
         docEditor = new DocsAPI.DocEditor("iframeEditor", config);
+        console.log(config)
+        console.log(docEditor)
+        console.log(document)
+        console.log(editorConfig)
        // docEditor = new DocsAPI.DocEditor("placeholder", config);
     };
 
