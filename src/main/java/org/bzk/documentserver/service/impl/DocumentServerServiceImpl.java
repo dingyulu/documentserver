@@ -616,7 +616,7 @@ public class DocumentServerServiceImpl implements DocumentServerService {
             // 1 - document is being edited
             case 1:
                 Log.info("action: EDITING");
-                System.out.println("action: EDITING");
+                System.out.println("action: EDITING"+js);
                 break;
             // 2 - document is ready for saving
             case 2:
@@ -626,7 +626,7 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                 System.out.println("---------------------------------------------------------------------------------------------"+ js);
                 //带有文档更改数据的文件的url地址（保存文件的修改记录）
                 String changesurl = js.containsKey("changesurl")?js.get("changesurl").toString():"";
-//              String changesurl = js.get("changesurl").toString();
+                //String changesurl = js.get("changesurl").toString();
                 System.out.println("changesurl----------"+changesurl);
                 //获取历史对象
                 String historyStr = js.get("history").toString();
@@ -638,6 +638,7 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                 //当前文档版本的 url 地址(保存变更后的文件)
                 String url = (String) js.get("url");
                 System.out.println("url---------"+url);
+                String filetype = (String) js.get("filetype");
 
                 // 根据文件id获取数据库中存在的记录
                 long count = historyService.count(new LambdaQueryWrapper<HistoryDoc>().eq(HistoryDoc::getFileId, id));
@@ -655,6 +656,8 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                     historyDoc.setUrl(url);
                     historyDoc.setUserId(user.getId());
                     historyDoc.setUserName(user.getName());
+                    historyDoc.setChangesUrl(changesurl);
+                    historyDoc.setFileType(filetype);
                     if (!historyService.saveOrUpdate(historyDoc)) {
                         Log.error("保存{}失败",historyDoc);
                     }else{

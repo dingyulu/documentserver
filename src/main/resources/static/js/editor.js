@@ -249,7 +249,34 @@ var Editor = function () {
                  * @param event
                  */
                 onRequestHistoryData: function (event) {
+                    let fileId2 = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
                     var version = event.data;
+                    console.log("onRequestHistoryData-----event",event)
+                    $.ajax({
+                        url: "http://192.168.198.128:8099/api/changes?version="+version+"&fileId2="+fileId2,
+                        success: function (result) {
+                            console.log("成功:" + JSON.stringify(result));
+                            var url = result.url;
+                            var key = result.key;
+                            var version = result.version;
+                            var changesurl = result.changesurl;
+                            var fileType = result.fileType;
+                            docEditor.setHistoryData({
+                                "fileType": fileType,
+                                "changesurl": changesurl,
+                                "key": key,
+                                // "previous": {
+                                //     "key": key,
+                                //     "url": url,
+                                // },
+                                "url": url,
+                                "version": version,
+                            });
+                        },
+                        error: function (result) {
+                            console.log("错误:" + JSON.stringify(result));
+                        },
+                    });
                     // docEditor.setHistoryData({
                     //     "changesUrl": "https://example.com/url-to-changes.zip",
                     //     "fileType": "docx",
@@ -335,10 +362,6 @@ var Editor = function () {
         };
 
         docEditor = new DocsAPI.DocEditor("iframeEditor", config);
-        console.log(config)
-        console.log(docEditor)
-        console.log(document)
-        console.log(editorConfig)
        // docEditor = new DocsAPI.DocEditor("placeholder", config);
     };
 

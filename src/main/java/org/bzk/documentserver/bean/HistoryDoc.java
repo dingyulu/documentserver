@@ -27,4 +27,8 @@ public class HistoryDoc {
     private String fileId;
     /**用户名*/
     private String userName;
+    /**文件后缀*/
+    private String fileType;
+    /**文档编辑数据的文件url*/
+    private String changesUrl;
 }

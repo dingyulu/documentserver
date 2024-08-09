@@ -1,7 +1,9 @@
 package org.bzk.documentserver.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.bzk.documentserver.bean.ChangeUrl;
 import org.bzk.documentserver.bean.HistoryDoc;
 import org.bzk.documentserver.bean.HistoryVo;
 import org.bzk.documentserver.bean.User;
@@ -70,6 +72,18 @@ public class HistoryServiceImpl extends ServiceImpl<HistoryMapper, HistoryDoc> i
     public List<HistoryDoc> listByFileId(String fileId) {
         List<HistoryDoc> historyList =historyMapper.selectByFileId(fileId);
         return historyList;
+    }
+
+    @Override
+    public ChangeUrl changeUrls(String version ,String fileId2) {
+        HistoryDoc historyDoc = historyService.getOne(new QueryWrapper<HistoryDoc>().eq("version", version).eq("file_id",fileId2));;
+        ChangeUrl changeUrl = new ChangeUrl();
+        changeUrl.setUrl(historyDoc.getUrl());
+        changeUrl.setKey(historyDoc.getDocKey());
+        changeUrl.setVersion(historyDoc.getVersion());
+        changeUrl.setChangesUrl(historyDoc.getChangesUrl());
+        changeUrl.setFileType(historyDoc.getFileType());
+        return changeUrl;
     }
 
 
