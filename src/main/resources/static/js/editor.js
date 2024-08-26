@@ -192,11 +192,12 @@ var Editor = function () {
                  */
                 onRequestHistory : function () {
                     let fileId = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
-                    console.log(fileId,"1111111111111111111111111111")
+                    // console.log(fileId,"1111111111111111111111111111");
+
                     $.ajax({
                         url: "http://192.168.198.128:8099/api/history?fileId="+fileId,
                         success: function (result) {
-                            console.log("成功:" + JSON.stringify(result));
+                            // console.log("成功:" + JSON.stringify(result));
                             console.log(result.length);
                             docEditor.refreshHistory({
                                     "currentVersion": result.length,
@@ -204,7 +205,7 @@ var Editor = function () {
                             });
                         },
                         error: function (result) {
-                            console.log("错误:" + JSON.stringify(result));
+                            // console.log("错误:" + JSON.stringify(result));
                         },
                     });
                     // docEditor.refreshHistory({
@@ -240,7 +241,10 @@ var Editor = function () {
                  * 如果未声明该方法，则不会显示 关闭历史记录 按钮。
                  */
                 onRequestHistoryClose: function () {
-                    document.location.reload();
+                    // console.log("关闭历史记录！！！！");
+                    // console.log(window.document);
+                    window.document.location.reload();
+                    // console.log(window.document,"关闭历史按钮document........");
                 },
                 /**
                  * 当用户试图点击文档版本历史中的特定文档版本时调用的函数。
@@ -248,33 +252,42 @@ var Editor = function () {
                  * 文档版本号在 data 参数中发送。 如果未声明该方法和 onRequestHistory 方法，则不会显示 版本历史 按钮。
                  * @param event
                  */
-                onRequestHistoryData: function (event) {
+                onRequestHistoryData: async function (event) {
                     let fileId2 = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
                     var version = event.data;
-                    console.log("onRequestHistoryData-----event",event)
-                    $.ajax({
+                    // console.log("onRequestHistoryData-----event",event);
+                    var version2 = version - 1;
+                    var shouldShowPrevious = false;
+                    if(version2 != 0){
+                        shouldShowPrevious = true;
+                        response1 = await $.ajax({
+                            url: "http://192.168.198.128:8099/api/changes?version="+version2+"&fileId2="+fileId2,
+                        })
+                    }
+                     $.ajax({
                         url: "http://192.168.198.128:8099/api/changes?version="+version+"&fileId2="+fileId2,
                         success: function (result) {
-                            console.log("成功:" + JSON.stringify(result));
+                            // console.log("成功:" + JSON.stringify(result));
                             var url = result.url;
                             var key = result.key;
                             var version = result.version;
                             var changesurl = result.changesurl;
                             var fileType = result.fileType;
                             docEditor.setHistoryData({
-                                "fileType": fileType,
                                 "changesurl": changesurl,
+                                "fileType": fileType,
                                 "key": key,
-                                // "previous": {
-                                //     "key": key,
-                                //     "url": url,
-                                // },
+                                "previous": shouldShowPrevious ? {
+                                    "fileType": response1.fileType,
+                                    "key": response1.key,
+                                    "url": response1.url
+                                } : {},
                                 "url": url,
                                 "version": version,
                             });
                         },
                         error: function (result) {
-                            console.log("错误:" + JSON.stringify(result));
+                            // console.log("错误:" + JSON.stringify(result));
                         },
                     });
                     // docEditor.setHistoryData({
@@ -326,43 +339,111 @@ var Editor = function () {
                  * 其中 serverVersion 是保存文档后返回的 历史对象 中的 serverVersion。
                  * @param event
                  */
-                onRequestRestore: function (event) {
-                    // var fileType = event.data.fileType;
-                    // var url = event.data.url;
-                    // var version = event.data.version;
-                    // docEditor.refreshHistory({
-                    //     "currentVersion": 2,
-                    //     "history": [
-                    //         {
-                    //             "changes": changes,
-                    //             "created": "2010-07-06 10:13 AM",
-                    //             "key": "af86C7e71Ca8",
-                    //             "serverVersion": serverVersion,
-                    //             "user": {
-                    //                 "id": "F89d8069ba2b",
-                    //                 "name": "Kate Cage"
-                    //             },
-                    //             "version": 1
-                    //         },
-                    //         {
-                    //             "changes": changes,
-                    //             "created": "2010-07-07 3:46 PM",
-                    //             "key": "Khirz6zTPdfd7",
-                    //             "user": {
-                    //                 "id": "78e1e841",
-                    //                 "name": "John Smith"
-                    //             },
-                    //             "version": 2
-                    //         },
-                    //     ]
-                    // });
-                }
+                // onRequestRestore:  function (event) {
+                //     try{
+                //         console.log(event,"点击恢复按钮，event事件........");
+                //         var fileType = event.data.fileType;
+                //         var url = event.data.url;
+                //         var version = event.data.version;
+                //         let fileId3 = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
+                //         //点击恢复查询要恢复的这条记录，版本更该为最新版本添加到历史数据中
+                //         let response = $.ajax({
+                //             url: "http://192.168.198.128:8099/api/oneHistory?version="+version+"&fileId="+fileId3,
+                //         });
+                //         console.log(response,"1111111aaaaaaaaaaaa")
+                //         //版本号
+                //         let response2 = $.ajax({
+                //             url: "http://192.168.198.128:8099/api/history?fileId="+fileId3,
+                //         });
+                //         console.log(response2,"222222222aaaaaaaaaaaa")
+                //         $.when(response, response2).then(function (response, response2) {
+                //             var responseElement = response[0];
+                //             var response2Element = response2[0];
+                //             console.log(response[0],"11111111111111.......................")
+                //             console.log(response2,"11111111111111.......................")
+                //             $.ajax({
+                //                 url: "http://192.168.198.128:8099/api/addHistory",
+                //                 type: "POST",
+                //                 contentType: "application/json; charset=utf-8",
+                //                 data:JSON.stringify ({
+                //                     "serverVersion": responseElement.serverVersion,
+                //                     "created": responseElement.created,
+                //                     "userId": responseElement.userId,
+                //                     "userName": responseElement.userName,
+                //                     "docKey": responseElement.docKey,
+                //                     "version":response2Element.length + 1,
+                //                     "url": responseElement.url,
+                //                     "changesUrl": responseElement.changesUrl,
+                //                     "fileId": responseElement.fileId,
+                //                     "fileType": fileType
+                //                 }),
+                //                 success: function (result) {
+                //                     $.ajax({
+                //                         url: "http://192.168.198.128:8099/api/history?fileId="+fileId3,
+                //                         success: function (result) {
+                //                             console.log("成功:" + JSON.stringify(result));
+                //                             console.log(result.length);
+                //                             docEditor.refreshHistory({
+                //                                 "currentVersion": result.length,
+                //                                 "history": result,
+                //                             });
+                //                         },
+                //                         error: function (result) {
+                //                             console.log("错误:" + JSON.stringify(result));
+                //                         },
+                //                     });
+                //                     console.log("成功:" + JSON.stringify(result));
+                //                 },
+                //                 error: function (result) {
+                //                     console.log("错误:" + JSON.stringify(result));
+                //                 },
+                //             });
+                //         });
+                //     }catch (e) {
+                //         console.log(e.message);
+                //     }
+                //
+                //
+                //     // var fileType = event.data.fileType;
+                //     // var url = event.data.url;
+                //     // var version = event.data.version;
+                //     // docEditor.refreshHistory({
+                //     //     "currentVersion": 2,
+                //     //     "history": [
+                //     //         {
+                //     //             "changes": changes,
+                //     //             "created": "2010-07-06 10:13 AM",
+                //     //             "key": "af86C7e71Ca8",
+                //     //             "serverVersion": serverVersion,
+                //     //             "user": {
+                //     //                 "id": "F89d8069ba2b",
+                //     //                 "name": "Kate Cage"
+                //     //             },
+                //     //             "version": 1
+                //     //         },
+                //     //         {
+                //     //             "changes": changes,
+                //     //             "created": "2010-07-07 3:46 PM",
+                //     //             "key": "Khirz6zTPdfd7",
+                //     //             "user": {
+                //     //                 "id": "78e1e841",
+                //     //                 "name": "John Smith"
+                //     //             },
+                //     //             "version": 2
+                //     //         },
+                //     //     ]
+                //     // });
+                // }
 
             }
         };
 
         docEditor = new DocsAPI.DocEditor("iframeEditor", config);
        // docEditor = new DocsAPI.DocEditor("placeholder", config);
+       //  console.log(document,"当前文档的document.........")
+       //  console.log(docEditor,"当前文档的docEditor.........")
+       //  console.log(config,"当前文档的config.........")
+       //  console.log(editorConfig,"当前文档的editorConfig.........")
     };
 
     return {

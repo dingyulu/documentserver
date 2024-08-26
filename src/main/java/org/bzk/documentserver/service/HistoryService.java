@@ -11,7 +11,8 @@ import java.util.List;
 public interface HistoryService extends IService<HistoryDoc> {
     List<HistoryVo> history( String fileId);
 
-    //根据文件idc查询历史记录
+    HistoryDoc oneHistory( String fileId,String version);
+    //根据文件id查询历史记录
     List<HistoryDoc>  listByFileId(String fileId);
 
     ChangeUrl changeUrls(String version,String fileId2);

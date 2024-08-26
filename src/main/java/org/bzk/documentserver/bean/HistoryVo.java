@@ -10,5 +10,6 @@ public class HistoryVo {
     private String key;
     private String version;
     private User user;
+    private Changes changes;
 
 }

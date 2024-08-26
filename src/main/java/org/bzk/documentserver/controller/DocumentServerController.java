@@ -214,27 +214,6 @@ public class DocumentServerController {
             model.addAttribute("document", document);
             model.addAttribute("editorConfig", editorConfig);
             System.out.println("edit.0..." + document + "...\n" + editorConfig);
-
-            //文件第一个版本处理逻辑，获取当前文件id，文档key,用户id 用户名，created,version ,fileType,url
-            HistoryDoc historyDoc = new HistoryDoc();
-            historyDoc.setVersion("1");
-            historyDoc.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            historyDoc.setServerVersion("");
-            historyDoc.setDocKey(document.getKey());
-            historyDoc.setFileId(id);
-            historyDoc.setUrl("");
-            historyDoc.setChangesUrl("");
-            historyDoc.setUserId(editorConfig.getUser().getId());
-            historyDoc.setUserName(editorConfig.getUser().getName());
-            historyDoc.setFileType(document.getFileType());
-            long count = historyService.count(new LambdaQueryWrapper<HistoryDoc>().eq(HistoryDoc::getFileId, id));
-            if (count < 1) {
-                if (!historyService.saveOrUpdate(historyDoc)) {
-                    Log.error("保存{}失败", historyDoc);
-                } else {
-                    Log.info("保存{}成功", historyDoc);
-                }
-            }
             return "/editor";
         }
 
@@ -609,10 +588,24 @@ public class DocumentServerController {
         return historyService.history(fileId);
     }
 
+    @GetMapping("/oneHistory")
+    @ResponseBody
+    public HistoryDoc history(String fileId,String version) {
+        return historyService.oneHistory(fileId,version);
+    }
+
     @GetMapping("/changes")
     @ResponseBody
     public ChangeUrl changeUrls(String version,String fileId2) {
         return historyService.changeUrls(version,fileId2);
+    }
+
+    @PostMapping("/addHistory")
+    @ResponseBody
+    public void addHistory(@RequestBody HistoryDoc history) {
+        if (!historyService.save(history)) {
+            throw new RuntimeException("Failed to save history.");
+        }
     }
 
 }

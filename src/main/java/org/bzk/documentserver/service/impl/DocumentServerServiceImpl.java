@@ -609,7 +609,6 @@ public class DocumentServerServiceImpl implements DocumentServerService {
         JSONObject js = JSON.parseObject(body);
         System.out.println("前置保存。。。。js。"+js);
        // js。{"key":"QDD8rEAMxyuy3ABn3Ne9uPdzQgO6dMIkrr7OXWBwS4NPrwJJJzcd6OX","status":7,"users":["uid-undefined"],"lastsave":"2023-05-18T12:52:43.000Z","forcesavetype":0}
-        //获取回调通知对象js,获取所需要参数currentVersion，history[{created,key,user{id,name},version,serverVersion}],changesUrl,fileType,previous........
         PrintWriter writer = response.getWriter();
         String error = "0";
         switch (js.getInteger("status")) {
@@ -705,7 +704,7 @@ public class DocumentServerServiceImpl implements DocumentServerService {
             contetnType = (String) obj.get("content_type");
         }
         String finalContetnType = contetnType;
-      HttpUtils.download(url, (InputStream is) -> FileUtils.save(is,finalContetnType, path, fileType,id, minioUploadUtil));
+        HttpUtils.download(url, (InputStream is) -> FileUtils.save(is,finalContetnType, path, fileType,id, minioUploadUtil));
 
 
         boolean endsWithOform = path.endsWith(".oform");
