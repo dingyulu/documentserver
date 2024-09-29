@@ -26,6 +26,8 @@ public interface DocumentServerService {
     void callBack(HttpServletRequest request, HttpServletResponse response) throws IOException, DocumentServerException;
 
     void download(String id, HttpServletResponse response) throws IOException;
+
+     void downloadOnlyOfrom(String id, HttpServletResponse response) throws IOException, DocumentServerException;
     void downloadPdf(String id, HttpServletResponse response) throws IOException, DocumentServerException;
     void downloadPng(String id,String height,String width,String allPageFlag, HttpServletResponse response) throws IOException, DocumentServerException;
      void downloadOform(String id, String templateCode,  HttpServletResponse response,String tenantId,String userId,String user,String oformId,String config,String configOut,String category,String needClearId)throws IOException, DocumentServerException ;

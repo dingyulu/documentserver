@@ -388,6 +388,17 @@ public class DocumentServerController {
         }
     }
 
+    //下载Oform
+    @GetMapping("/downloadOnlyOform")
+    public void downloadOnlyOform(@RequestParam String id, HttpServletResponse response) {
+        System.out.println("43. 前端下载PDF文件" + id);
+        Log.info("43. 前端下载PDF文件" + id);
+        try {
+            documentService.downloadOnlyOfrom(id, response);
+        } catch (IOException | DocumentServerException e) {
+            e.printStackTrace();
+        }
+    }
 
     @GetMapping("/downloadOform") //ifDownloadLocal 0 不下载到本地， 1 直接存为模板文档 2 下载到本地同时转为线上模板
     public void downloadOform(@RequestParam String id, String templateCode, String tenantId, String userId, String user, String ifDownloadLocal, HttpServletResponse response) {

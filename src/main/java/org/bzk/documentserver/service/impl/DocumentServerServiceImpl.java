@@ -194,6 +194,112 @@ public class DocumentServerServiceImpl implements DocumentServerService {
             minioUploadUtil.dowloadMinioFile((String)obj.get("attach_file_name"),bucketName);
         }
     }
+    //下载oform
+
+    @Override
+    public void downloadOnlyOfrom(String id, HttpServletResponse response) throws IOException, DocumentServerException {
+        Map<String, Object> obj = fileService.getFileInfo(id);
+        String fileName = fileService.getFileName(id);
+        String sourcePath = (String) obj.get("path");
+
+
+        String expensionName = sourcePath.substring(sourcePath.indexOf(".")+1,sourcePath.length());
+
+        File file = new File(FilenameUtils.normalize(sourcePath));
+
+        String fileIdName = fileService.getIdFileName(id);
+        String  key = "";
+        if(StringUtils.isEmpty(fileType)||!fileType.equals("minio")){
+            key =documentServerUtils.key(file);
+        }
+        else{
+
+            String bucketName = "onlinedocument";
+            if(id.startsWith("aabbcc")){
+                bucketName ="annex";
+            }
+            key = documentServerUtils.keyMinio( minioUploadUtil.downloadMinio(fileIdName, bucketName),fileIdName);
+        }
+
+        // String key =documentServerUtils.key(file);
+        String url = documentServerUtils.downloadUrl(id);
+        JSONObject json = new JSONObject();
+//        {
+//            "async": false,
+//                "filetype": "docx",
+//                "key": "Khirz6zTPdfd7",
+//                "outputtype": "pdf",
+//                "title": "Example Document Title.docx",
+//                "url": "https://example.com/url-to-example-document.docx"
+//        }
+        json.put("async",false);
+        json.put("filetype",expensionName);
+        json.put("key",key);
+        json.put("outputtype",expensionName);
+        json.put("password","123456");
+        // json.put("title","pdf");
+        json.put("url",url);
+
+        JSONObject documentLayout = new JSONObject();
+        documentLayout.put("drawPlaceHolders",true);
+        documentLayout.put("drawFormHighlight",false);
+        documentLayout.put("isPrint",true);
+        json.put("documentLayout",documentLayout);
+//
+//
+//        String temp2 ="{\"spreadsheetLayout\":{\"ignorePrintArea\":true,\"orientation\":\"portrait\",\"fitToWidth\":\"0\",\"fitToHeight\":\"0\",\"scale\":\"100\",\"headings\":false,\"gridLines\":false,\"pageSize\":{\"width\":\"210mm\",\"height\":\"297mm\"},\"margins\":{\"left\":\"17.8mm\",\"right\":\"17.8mm\",\"top\":\"19.1mm\",\"bottom\":\"19.1mm\"}}}";
+//        JSONObject spreadsheetLayout = JSONObject.parseObject(temp2);
+//        json.put("spreadsheetLayout",spreadsheetLayout.getJSONObject("spreadsheetLayout"));
+
+        // json.put("url","https://doc.baizhanke.com/api/download?id=20230926162728116");
+        System.out.println("convert param: " + json);
+
+        String post = HttpUtils.post(properties.getConverter(), JSON.toJSONString(json));
+        System.out.println("convert result"+post);
+        JSONObject temp = JSONObject.parseObject(post);
+        String url2 = temp.getString("fileUrl");
+
+//        String value="";
+//        // 使用 String.format() 插入变量到正则表达式中
+//        String regex = String.format("([^/]+)\\.%s$", expensionName);
+//        Pattern pattern = Pattern.compile(regex);
+//        Matcher matcher = pattern.matcher(sourcePath);
+//        if (matcher.find()) {
+//            value = matcher.group(1);
+//            System.out.println(value); // 输出: 20230715111945115
+//        }
+//        String fileNameReal = fileService.getFileName(value);
+        // fileName="报价2023092616.oform";
+        int lastSlashIndex = fileName.lastIndexOf(".");
+        System.out.println("filename"+ String.valueOf(lastSlashIndex) +"..."+fileName);
+        String finalResult = fileName.substring(0, lastSlashIndex);
+        String contetnType ="";
+        if(obj.get("content_type")!=null){
+            contetnType = (String) obj.get("content_type");
+        }
+        String finalContetnType = contetnType;
+        HttpUtils.download(url2, (InputStream is) -> FileUtils.save(is, finalContetnType, pathbak +finalResult+"_1"+"."+expensionName,  fileType,id,  minioUploadUtil));
+
+        // String sourcePath = "/home/ubuntu/data/documentServer/data/20230925220537775.oform";
+        //  String targetPath = pathbak + "/home/ubuntu/data/documentServer/databak/12333.pdf";
+//        int lastSlashIndex = fileName.lastIndexOf(".");
+//        System.out.println("filename"+ String.valueOf(lastSlashIndex) +"..."+fileName);
+//        String finalResult = fileName.substring(0, lastSlashIndex)+".pdf";
+        String targetPath = pathbak +finalResult+"."+expensionName;
+        // PdfFormToReadOnlyConverter.convert(pathbak +finalResult+"_1"+".pdf",targetPath);
+        //PdfFormToReadOnlyConverter.convert(pathbak +finalResult+"_1"+".pdf",targetPath);
+        // 获取源文件的扩展名
+        // String sourceExtension = sourcePath.substring(sourcePath.lastIndexOf("."));
+
+        // 替换目标路径中的文件名
+        //targetPath = targetPath.substring(0, targetPath.lastIndexOf("/") + 1) + "12333" + sourceExtension;
+        //  DocxToPdfConverter.run(targetPath,pathbak +finalResult+".pdf");
+
+        System.out.println("目标路径: " + targetPath);
+        FileUtils.getResourcePdf(targetPath, finalResult+"."+expensionName, response);
+    }
+
+
 
     @Override
     public void downloadPdf(String id, HttpServletResponse response) throws IOException, DocumentServerException {
@@ -252,6 +358,7 @@ public class DocumentServerServiceImpl implements DocumentServerService {
 
         // json.put("url","https://doc.baizhanke.com/api/download?id=20230926162728116");
         System.out.println("convert param: " + json);
+
         String post = HttpUtils.post(properties.getConverter(), JSON.toJSONString(json));
         System.out.println("convert result"+post);
         JSONObject temp = JSONObject.parseObject(post);
@@ -622,21 +729,21 @@ public class DocumentServerServiceImpl implements DocumentServerService {
                 Log.info("action: SAVE");
                 System.out.println("action: SAVE"+js);
                 resourceAcquisitionAndSave(js.getString("url"), filePath,js.getString("key"),id);
-                System.out.println("---------------------------------------------------------------------------------------------"+ js);
+                //System.out.println("---------------------------------------------------------------------------------------------"+ js);
                 //带有文档更改数据的文件的url地址（保存文件的修改记录）
                 String changesurl = js.containsKey("changesurl")?js.get("changesurl").toString():"";
                 //String changesurl = js.get("changesurl").toString();
-                System.out.println("changesurl----------"+changesurl);
+                //System.out.println("changesurl----------"+changesurl);
                 //获取历史对象
                 String historyStr = js.get("history").toString();
                 History history = JSON.parseObject(historyStr,History.class);
-                System.out.println("history-----------"+history);
+                //System.out.println("history-----------"+history);
                 //文档唯一标识
                 String key = (String) js.get("key");
-                System.out.println("key---------"+key);
+                //System.out.println("key---------"+key);
                 //当前文档版本的 url 地址(保存变更后的文件)
                 String url = (String) js.get("url");
-                System.out.println("url---------"+url);
+                //System.out.println("url---------"+url);
                 String filetype = (String) js.get("filetype");
 
                 // 根据文件id获取数据库中存在的记录

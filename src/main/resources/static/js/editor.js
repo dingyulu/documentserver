@@ -69,7 +69,8 @@ var Editor = function () {
                    // zoom: 100,
                     zoom: editorConfig.zoom,
 
-                    defalut: editorConfig.defalut
+                    defalut: editorConfig.defalut,
+                    mobileForceView: false
                 }
             },
             events: {
@@ -195,17 +196,17 @@ var Editor = function () {
                     // console.log(fileId,"1111111111111111111111111111");
 
                     $.ajax({
-                        url: "http://192.168.198.128:8099/api/history?fileId="+fileId,
+                        url: "https://doc.baizhanke.com/api/history?fileId="+fileId,
                         success: function (result) {
                             // console.log("成功:" + JSON.stringify(result));
-                            console.log(result.length);
+                            // console.log(result.length);
                             docEditor.refreshHistory({
                                     "currentVersion": result.length,
                                     "history": result,
                             });
                         },
                         error: function (result) {
-                            // console.log("错误:" + JSON.stringify(result));
+                            console.log("错误:" + JSON.stringify(result));
                         },
                     });
                     // docEditor.refreshHistory({
@@ -261,11 +262,11 @@ var Editor = function () {
                     if(version2 != 0){
                         shouldShowPrevious = true;
                         response1 = await $.ajax({
-                            url: "http://192.168.198.128:8099/api/changes?version="+version2+"&fileId2="+fileId2,
+                            url: "https://doc.baizhanke.com/api/changes?version="+version2+"&fileId2="+fileId2,
                         })
                     }
                      $.ajax({
-                        url: "http://192.168.198.128:8099/api/changes?version="+version+"&fileId2="+fileId2,
+                        url: "https://doc.baizhanke.com/api/changes?version="+version+"&fileId2="+fileId2,
                         success: function (result) {
                             // console.log("成功:" + JSON.stringify(result));
                             var url = result.url;
@@ -348,12 +349,12 @@ var Editor = function () {
                 //         let fileId3 = (editorConfig.callbackUrl).match(/id=(\d+)(?:&|$)/)[1];
                 //         //点击恢复查询要恢复的这条记录，版本更该为最新版本添加到历史数据中
                 //         let response = $.ajax({
-                //             url: "http://192.168.198.128:8099/api/oneHistory?version="+version+"&fileId="+fileId3,
+                //             url: "https://106.54.209.197:8099/api/oneHistory?version="+version+"&fileId="+fileId3,
                 //         });
                 //         console.log(response,"1111111aaaaaaaaaaaa")
                 //         //版本号
                 //         let response2 = $.ajax({
-                //             url: "http://192.168.198.128:8099/api/history?fileId="+fileId3,
+                //             url: "https://106.54.209.197:8099/api/history?fileId="+fileId3,
                 //         });
                 //         console.log(response2,"222222222aaaaaaaaaaaa")
                 //         $.when(response, response2).then(function (response, response2) {
@@ -362,7 +363,7 @@ var Editor = function () {
                 //             console.log(response[0],"11111111111111.......................")
                 //             console.log(response2,"11111111111111.......................")
                 //             $.ajax({
-                //                 url: "http://192.168.198.128:8099/api/addHistory",
+                //                 url: "https://106.54.209.197:8099/api/addHistory",
                 //                 type: "POST",
                 //                 contentType: "application/json; charset=utf-8",
                 //                 data:JSON.stringify ({
@@ -379,7 +380,7 @@ var Editor = function () {
                 //                 }),
                 //                 success: function (result) {
                 //                     $.ajax({
-                //                         url: "http://192.168.198.128:8099/api/history?fileId="+fileId3,
+                //                         url: "https://106.54.209.197:8099/api/history?fileId="+fileId3,
                 //                         success: function (result) {
                 //                             console.log("成功:" + JSON.stringify(result));
                 //                             console.log(result.length);
@@ -439,11 +440,6 @@ var Editor = function () {
         };
 
         docEditor = new DocsAPI.DocEditor("iframeEditor", config);
-       // docEditor = new DocsAPI.DocEditor("placeholder", config);
-       //  console.log(document,"当前文档的document.........")
-       //  console.log(docEditor,"当前文档的docEditor.........")
-       //  console.log(config,"当前文档的config.........")
-       //  console.log(editorConfig,"当前文档的editorConfig.........")
     };
 
     return {
